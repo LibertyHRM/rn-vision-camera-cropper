@@ -1,5 +1,5 @@
 {
-  "name": "@mai/rn-vision-camera-cropper",
+  "name": "@martha-mb/rn-vision-camera-cropper",
   "version": "1.0.0",
   "description": "A react native vision camera frame processor for cropping",
   "react-native": "src/index",

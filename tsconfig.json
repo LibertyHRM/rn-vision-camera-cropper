@@ -2,7 +2,7 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "@mai/rn-vision-camera-cropper": ["./src/index"]
+      "@martha-mb/rn-vision-camera-cropper": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
