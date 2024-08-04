@@ -2,7 +2,7 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "vision-camera-cropper": ["./src/index"]
+      "@mai/rn-vision-camera-cropper": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
