@@ -11,43 +11,49 @@ class BitmapUtils {
         let imageSize = CGSizeMake(image.size.width * image.scale, image.size.height * image.scale);
         let _newWidth = CGFloat(newWidth)
         let _newHeight = CGFloat(newHeight)
-        
+
         if newWidth>0 && newHeight>0{
             let widthRatio = _newWidth / imageSize.width
             let heightRatio = _newHeight / imageSize.height
-            
-            var ratio = min(widthRatio, heightRatio)
-            ratio = min(ratio, 1)
+
+            let ratio = min(widthRatio, heightRatio)
+
             let newSize = CGSizeMake(imageSize.width * ratio, imageSize.height * ratio)
-            
+
             UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
-            image.draw(in: CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height))
+            image.draw(in: CGRect(origin: .zero, size: newSize))
             let newImage = UIGraphicsGetImageFromCurrentImageContext()
             UIGraphicsEndImageContext()
             return newImage ?? image
         }
         return image
     }
-    
-    static func getMinQuality(_ image: UIImage,path:String, quality: CGFloat, maxSizeInMB: CGFloat)-> CGFloat?{
-        guard let resizedImageData = image.jpegData(compressionQuality: 1.0) else {
-            return nil
-        }
-        let maxSizeInBytes: Int = Int(maxSizeInMB * 1024 * 1024)
-        
-        var compressionQuality: CGFloat = quality
-        while resizedImageData.count > maxSizeInBytes && compressionQuality > 0 {
-            compressionQuality -= 0.1
-            guard let imageData = image.jpegData(compressionQuality: compressionQuality) else {
-                return nil
+
+    static func getMinQuality(image: UIImage, maxSizeInMB: CGFloat) -> CGFloat? {
+        // Convert max size from MB to bytes
+        let maxSizeInBytes = maxSizeInMB * 1024 * 1024
+        var compressionQuality: CGFloat = 1.0 // Start with highest quality
+        var compressedData: Data?
+
+        repeat {
+            // Compress the image with the current compression quality
+            compressedData = image.jpegData(compressionQuality: compressionQuality)
+
+            // Check the size of the compressed data
+            if let dataSize = compressedData?.count {
+                if CGFloat(dataSize) <= maxSizeInBytes {
+                    return compressionQuality
+                }
             }
-            if compressionQuality == 0 {
-                break
-            }
-        }
+
+            // Decrease the compression quality for the next iteration
+            compressionQuality -= 0.1 // Decrease by 10%
+
+        } while compressionQuality > 0.0 // Continue until quality reaches 0.0
+
         return compressionQuality
     }
-    
+
     static func getFileSize(_ filePath:String) -> Int64? {
         do {
             // Lấy thông tin của tệp
@@ -63,8 +69,8 @@ class BitmapUtils {
             return 0
         }
     }
-    
-    
+
+
     static func saveImage(_ image:UIImage, nameFile: String) -> String {
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent(nameFile)
@@ -72,12 +78,12 @@ class BitmapUtils {
         try? image.jpegData(compressionQuality: 1.0)?.write(to: url)
         return url.path
     }
-    
+
     static func compressImage(_ image:UIImage, path: String, quality: CGFloat) -> String {
         try? image.jpegData(compressionQuality: quality)?.write(to: URL(fileURLWithPath: path))
         return path
     }
-    
+
     static func getBase64FromImage(_ image:UIImage) -> String {
         let dataTmp = image.jpegData(compressionQuality: 100)
         if let data = dataTmp {
@@ -85,12 +91,12 @@ class BitmapUtils {
         }
         return ""
     }
-    
+
     static func clearCacheDirectory(_ directory: URL) {
         do {
             // Get the contents of the temporary directory
             let contents = try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil, options: [])
-            
+
             // Iterate over each item
             for itemURL in contents {
                 var isDirectory: ObjCBool = false
